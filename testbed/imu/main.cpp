@@ -1,33 +1,14 @@
-#include "Common/MPU9250.h"
-#include "Navio2/LSM9DS1.h"
-#include "Common/Util.h"
+#include "Sensors.h"
 #include <unistd.h>
 #include <string>
 #include <memory>
-
-std::unique_ptr <InertialSensor> get_inertial_sensor( std::string sensor_name)
-{
-    if (sensor_name == "mpu") {
-        printf("Selected: MPU9250\n");
-        auto ptr = std::unique_ptr <InertialSensor>{ new MPU9250() };
-        return ptr;
-    }
-    else if (sensor_name == "lsm") {
-        printf("Selected: LSM9DS1\n");
-        auto ptr = std::unique_ptr <InertialSensor>{ new LSM9DS1() };
-        return ptr;
-    }
-    else {
-        return NULL;
-    }
-}
-
+//=============================================================================
 void print_help()
 {
     printf("Possible parameters:\nSensor selection: -i [sensor name]\n");
     printf("Sensors names: mpu is MPU9250, lsm is LSM9DS1\nFor help: -h\n");
 }
-
+//=============================================================================
 std::string get_sensor_name(int argc, char *argv[])
 {
     if (get_navio_version() == NAVIO2) {
@@ -71,34 +52,24 @@ int main(int argc, char *argv[])
     if (sensor_name.empty())
         return EXIT_FAILURE;
 
-    auto sensor = get_inertial_sensor(sensor_name);
 
-    if (!sensor) {
+    Sensors* sensors = new Sensors(sensor_name);
+
+    if (sensors->isISEnabled) {
         printf("Wrong sensor name. Select: mpu or lsm\n");
         return EXIT_FAILURE;
     }
 
-    if (!sensor->probe()) {
-        printf("Sensor not enabled\n");
-        return EXIT_FAILURE;
-    }
-    sensor->initialize();
 
-    float ax, ay, az;
-    float gx, gy, gz;
-    float mx, my, mz;
 //-------------------------------------------------------------------------
 
     while(1) {
-        sensor->update();
-        sensor->read_accelerometer(&ax, &ay, &az);
-        sensor->read_gyroscope(&gx, &gy, &gz);
-        sensor->read_magnetometer(&mx, &my, &mz);
-        printf("Acc: %+7.3f %+7.3f %+7.3f  ", ax, ay, az);
-        printf("Gyr: %+8.3f %+8.3f %+8.3f  ", gx, gy, gz);
-        printf("Mag: %+7.3f %+7.3f %+7.3f\n", mx, my, mz);
+	sensors->update();
+        printf("Acc: %+7.3f %+7.3f %+7.3f  ", sensors->imu.ax, sensors->imu.ay, sensors->imu.az);
+        printf("Gyr: %+8.3f %+8.3f %+8.3f  ", sensors->imu.gx, sensors->imu.gy, sensors->imu.gz);
+        printf("Mag: %+7.3f %+7.3f %+7.3f\n", sensors->imu.mx, sensors->imu.my, sensors->imu.mz);
 
-       usleep(100000);
+        usleep(100000);
     }
 }
 
