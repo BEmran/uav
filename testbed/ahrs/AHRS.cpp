@@ -39,9 +39,9 @@ chrt -f -p 99 PID
 #define G_SI 9.80665
 #define PI   3.14159
 
-AHRS::AHRS(std::unique_ptr <InertialSensor> imu)
+AHRS::AHRS(Sensors* sensors_ptr))
 {
-    sensor = move(imu);
+    sensors = sensors_ptr;
     q0 = 1; q1 = 0; q2 = 0, q3 = 0; twoKi = 0; twoKp =2;
 }
 void AHRS::update(float dt)
@@ -53,16 +53,17 @@ void AHRS::update(float dt)
     float halfex, halfey, halfez;
     float qa, qb, qc;
 
-    float ax, ay, az;
-    float gx, gy, gz;
-    float mx, my, mz;
-
-    sensor->update();
-        sensor->read_accelerometer(&ax, &ay, &az);
-        sensor->read_gyroscope(&gx, &gy, &gz);
-        sensor->read_magnetometer(&mx, &my, &mz);
-
-
+    sensors->update();
+    float ax = sensors->imu.ax;
+    float ay = sensors->imu.ay;
+    float az = sensors->imu.az;
+    float gx = sensors->imu.gx;
+    float gy = sensors->imu.gy;
+    float gz = sensors->imu.gz;
+    float mx = sensors->imu.mx;
+    float my = sensors->imu.my;
+    float mz = sensors->imu.mz;
+    
     // Use IMU algorithm if magnetometer measurement invalid (avoids NaN in magnetometer normalisation)
     if((mx == 0.0f) && (my == 0.0f) && (mz == 0.0f)) {
         updateIMU(dt);
@@ -163,13 +164,13 @@ void AHRS::updateIMU(float dt)
     float halfex, halfey, halfez;
     float qa, qb, qc;
 
-    float ax, ay, az;
-    float gx, gy, gz;
-
-    // Accel + gyro.
-    sensor->update();
-    sensor->read_accelerometer(&ax, &ay, &az);
-    sensor->read_gyroscope(&gx, &gy, &gz);
+    sensors->update();
+    float ax = sensors->imu.ax;
+    float ay = sensors->imu.ay;
+    float az = sensors->imu.az;
+    float gx = sensors->imu.gx;
+    float gy = sensors->imu.gy;
+    float gz = sensors->imu.gz;
 
     ax /= G_SI;
     ay /= G_SI;
@@ -258,16 +259,16 @@ void AHRS::setGyroOffset()
     printf("Beginning Gyro calibration...\n");
     for(int i = 0; i<100; i++)
     {
-        sensor->update();
-        sensor->read_gyroscope(&gx, &gy, &gz);
+        sensors->update();
+
 
         gx *= 180 / PI;
         gy *= 180 / PI;
         gz *= 180 / PI;
 
-        offset[0] += gx*0.0175;
-        offset[1] += gy*0.0175;
-        offset[2] += gz*0.0175;
+        offset[0] += sensors->imu.gx*0.0175;
+        offset[1] += sensors->imu.gy*0.0175;
+        offset[2] += sensors->imu.gz*0.0175;
 
         usleep(10000);
     }
@@ -354,24 +355,6 @@ private:
 
 };
 
-
-
-std::unique_ptr <InertialSensor> get_inertial_sensor( std::string sensor_name)
-{
-    if (sensor_name == "mpu") {
-        printf("Selected: MPU9250\n");
-        auto ptr = std::unique_ptr <InertialSensor>{ new MPU9250() };
-        return ptr;
-    }
-    else if (sensor_name == "lsm") {
-        printf("Selected: LSM9DS1\n");
-        auto ptr = std::unique_ptr <InertialSensor>{ new LSM9DS1() };
-        return ptr;
-    }
-    else {
-        return NULL;
-    }
-}
 
 void print_help()
 {
@@ -486,19 +469,14 @@ int main(int argc, char *argv[])
     }
 
     auto sensor_name = get_sensor_name(argc, argv);
-
     if (sensor_name.empty())
         return EXIT_FAILURE;
 
-    auto imu = get_inertial_sensor(sensor_name);
 
-    if (!imu) {
+    Sensors* sensors = new Sensors(sensor_name);
+
+    if (sensors->isISEnabled) {
         printf("Wrong sensor name. Select: mpu or lsm\n");
-        return EXIT_FAILURE;
-    }
-
-    if (!imu->probe()) {
-        printf("Sensor not enable\n");
         return EXIT_FAILURE;
     }
 
@@ -513,7 +491,7 @@ int main(int argc, char *argv[])
         else
             sock = Socket();
 
-    auto ahrs = std::unique_ptr <AHRS>{new AHRS(move(imu)) };
+    AHRS ahrs = new ahrs(sensors);
 
     //-------------------- Setup gyroscope offset -----------------------------
 

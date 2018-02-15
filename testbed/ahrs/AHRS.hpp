@@ -13,7 +13,15 @@ twitter.com/emlidtech || www.emlid.com || info@emlid.com
 #include <cmath>
 #include <stdio.h>
 #include <memory>
-#include <Common/InertialSensor.h>
+#include <Sensors.h>
+
+
+struct imu_struct{
+    float ax, ay, az;
+    float gx, gy, gz;
+    float mx, my, mz;
+};
+
 
 class AHRS{
 private:
@@ -22,9 +30,9 @@ private:
 	float twoKi;
 	float twoKp;
 	float integralFBx, integralFBy, integralFBz;
-    std::unique_ptr <InertialSensor> sensor;
+        Sensors* sensors;
 public:
-    AHRS( std::unique_ptr <InertialSensor> imu);
+    AHRS(Sensors* sensors);
 
     void update(float dt);
     void updateIMU(float dt);
