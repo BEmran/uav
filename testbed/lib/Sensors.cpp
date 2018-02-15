@@ -49,9 +49,9 @@ void Sensors::calibrateGyro()
     {
         update();
 
-        gx *= 180 / PI;
-        gy *= 180 / PI;
-        gz *= 180 / PI;
+        imu.gx *= 180 / PI;
+        imu.gy *= 180 / PI;
+        imu.gz *= 180 / PI;
 
         offset[0] += imu.gx*0.0175;
         offset[1] += imu.gy*0.0175;

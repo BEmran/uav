@@ -24,7 +24,7 @@ void AHRS::update(float dt)
     float mx = sensors->imu.mx;
     float my = sensors->imu.my;
     float mz = sensors->imu.mz;
-    
+
     // Use IMU algorithm if magnetometer measurement invalid (avoids NaN in magnetometer normalisation)
     if((mx == 0.0f) && (my == 0.0f) && (mz == 0.0f)) {
         updateIMU(dt);
@@ -202,42 +202,6 @@ void AHRS::updateIMU(float dt)
     q1 *= recipNorm;
     q2 *= recipNorm;
     q3 *= recipNorm;
-}
-
-void AHRS::setGyroOffset()
-{
-    //---------------------- Calculate the offset -----------------------------
-
-    float offset[3] = {0.0, 0.0, 0.0};
-    float gx, gy, gz;
-
-    //-------------------------------------------------------------------------
-
-    printf("Beginning Gyro calibration...\n");
-    for(int i = 0; i<100; i++)
-    {
-        sensors->update();
-
-
-        gx *= 180 / PI;
-        gy *= 180 / PI;
-        gz *= 180 / PI;
-
-        offset[0] += sensors->imu.gx*0.0175;
-        offset[1] += sensors->imu.gy*0.0175;
-        offset[2] += sensors->imu.gz*0.0175;
-
-        usleep(10000);
-    }
-    offset[0]/=100.0;
-    offset[1]/=100.0;
-    offset[2]/=100.0;
-
-    printf("Offsets are: %f %f %f\n", offset[0], offset[1], offset[2]);
-
-    gyroOffset[0] = offset[0];
-    gyroOffset[1] = offset[1];
-    gyroOffset[2] = offset[2];
 }
 
 void AHRS::getEuler(float* roll, float* pitch, float* yaw)
