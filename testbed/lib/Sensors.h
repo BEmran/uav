@@ -7,6 +7,9 @@
 #include <unistd.h>
 #include <string>
 
+#define G_SI 9.80665
+#define PI   3.14159
+
 struct imu_struct{
     float ax, ay, az;
     float gx, gy, gz;
