@@ -16,13 +16,6 @@ twitter.com/emlidtech || www.emlid.com || info@emlid.com
 #include <Sensors.h>
 
 
-struct imu_struct{
-    float ax, ay, az;
-    float gx, gy, gz;
-    float mx, my, mz;
-};
-
-
 class AHRS{
 private:
 	float q0, q1, q2, q3;
