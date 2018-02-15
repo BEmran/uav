@@ -1,19 +1,19 @@
-/*
-Mahony AHRS algorithm implemented by Madgwick
-See: http://x-io.co.uk/open-source-imu-and-ahrs-algorithms/
-
-Adapted by Igor Vereninov (igor.vereninov@emlid.com)
-Provided to you by Emlid Ltd (c) 2014.
-twitter.com/emlidtech || www.emlid.com || info@emlid.com
-*/
-
 #ifndef AHRS_HPP
 #define AHRS_HPP
 
 #include <cmath>
 #include <stdio.h>
-#include <memory>
 #include <Sensors.h>
+
+#define G_SI 9.80665
+#define PI   3.14159
+
+
+struct imu_struct{
+    float ax, ay, az;
+    float gx, gy, gz;
+    float mx, my, mz;
+};
 
 
 class AHRS{
