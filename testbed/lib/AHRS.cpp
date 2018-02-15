@@ -1,6 +1,6 @@
 #include "AHRS.hpp"
 
-AHRS::AHRS(Sensors* sensors_ptr))
+AHRS::AHRS(Sensors* sensors_ptr)
 {
     sensors = sensors_ptr;
     q0 = 1; q1 = 0; q2 = 0, q3 = 0; twoKi = 0; twoKp =2;
@@ -210,10 +210,6 @@ void AHRS::setGyroOffset()
 
     float offset[3] = {0.0, 0.0, 0.0};
     float gx, gy, gz;
-
-    //----------------------- MPU initialization ------------------------------
-
-    sensor->initialize();
 
     //-------------------------------------------------------------------------
 

@@ -8,14 +8,6 @@
 #define G_SI 9.80665
 #define PI   3.14159
 
-
-struct imu_struct{
-    float ax, ay, az;
-    float gx, gy, gz;
-    float mx, my, mz;
-};
-
-
 class AHRS{
 private:
 	float q0, q1, q2, q3;
