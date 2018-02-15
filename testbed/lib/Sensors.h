@@ -18,9 +18,11 @@ class Sensors{
 public:
     bool isISEnabled;
     struct imu_struct imu;
+    struct imu_struct bias;
 
     Sensors (std::string sensor_name);
     void update();
+    void calibrateGyro();
 
 private:
     InertialSensor *is;
