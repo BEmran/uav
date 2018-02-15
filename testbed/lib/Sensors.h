@@ -6,6 +6,9 @@
 #include "Common/Util.h"
 #include <unistd.h>
 #include <string>
+#include <stdio.h>	// file, printf
+#include <sys/time.h>	// time
+
 
 #define G_SI 9.80665
 #define PI   3.14159
@@ -28,8 +31,12 @@ public:
     void calibrateGyro();
 
 private:
+    long unsigned time_now_;
     InertialSensor *is;
+    FILE * row_data_file_;   // File to store row data 
 
+    void storeInfo();
+    void getTime();
 };
 
 #endif //SENSORS_H
