@@ -1,7 +1,7 @@
 CXX = g++
 CFLAGS = -std=c++11 -Wno-psabi -c -I . -I */.
 
-SRC=$(wildcard */*.cpp */*/*.cpp
+SRC=$(wildcard */*.cpp */*/*.cpp)
 OBJECTS = $(SRC:.cpp=.o)
 
 %.o: %.cpp
