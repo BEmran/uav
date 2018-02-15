@@ -1,12 +1,11 @@
-CXX ?= g++
+CXX ?= g++ -std=c++11
 LIB = ../lib
 NAVIO = $(LIB)/Navio
-INCLUDES = -I $(LIB)
+INCLUDES = -I $(LIB) -I $(NAVIO)
 
 all:
 	$(MAKE) -C $(LIB) all
-	$(CXX) -std=c++11 $(INCLUDES) main.cpp -L$(LIB) -lmine -o mian
-
+	$(CXX) main.cpp -o main $(INCLUDES) -L $(LIB) -lmynavio -lrt
 clean:
 	rm -f mian
 

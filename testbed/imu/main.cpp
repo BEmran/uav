@@ -1,6 +1,6 @@
-#include "Navio/Common/MPU9250.h"
-#include "Navio/Navio2/LSM9DS1.h"
-#include "Navio/Common/Util.h"
+#include "Common/MPU9250.h"
+#include "Navio2/LSM9DS1.h"
+#include "Common/Util.h"
 #include <unistd.h>
 #include <string>
 #include <memory>
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
         printf("Gyr: %+8.3f %+8.3f %+8.3f  ", gx, gy, gz);
         printf("Mag: %+7.3f %+7.3f %+7.3f\n", mx, my, mz);
 
-       usleep(500000);
+       usleep(100000);
     }
 }
 
