@@ -25,10 +25,10 @@ Sensors::Sensors (std::string sensor_name){
         is = NULL;
     }
 
+    is->initialize();
     isISEnabled = !is->probe();
     if (isISEnabled){
-        is->initialize();
-	is->calibrateGyro();
+	calibrateGyro();
     }
 }
 
@@ -42,7 +42,12 @@ void Sensors::update(){
     imu.gx -= bias.gx;
     imu.gy -= bias.gy;
     imu.gz -= bias.gz;
+
+// store data
+    storeData();
+
 }
+
 //**************************************************************************
 // Calibrate Gyroscope sensor: find bias values
 //**************************************************************************
@@ -93,14 +98,14 @@ void Sensors::storeData() {
     fprintf(row_data_file_, " %+10.5f,  %+10.5f,  %+10.5f\n",imu.mx, imu.my, imu.mz);
 }
 //**************************************************************************
-// Get the current time 
+// Get the current time
 //**************************************************************************
 
 void Sensors::getTime() {
     // Timing data
     struct timeval tv;
 
-    // Calculate delta time 
+    // Calculate delta time
     gettimeofday(&tv, NULL);
     time_now_ = 1000000 * tv.tv_sec + tv.tv_usec;
 }

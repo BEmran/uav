@@ -33,9 +33,9 @@ public:
 private:
     long unsigned time_now_;
     InertialSensor *is;
-    FILE * row_data_file_;   // File to store row data 
+    FILE * row_data_file_;   // File to store row data
 
-    void storeInfo();
+    void storeData();
     void getTime();
 };
 
