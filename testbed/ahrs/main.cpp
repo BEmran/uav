@@ -191,6 +191,8 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
+    sensors->calibrateGyro();
+
     //--------------------------- Network setup -------------------------------
 
     Socket sock;
@@ -205,8 +207,6 @@ int main(int argc, char *argv[])
     AHRS *ahrs = new AHRS(sensors);
 
     //-------------------- Setup gyroscope offset -----------------------------
-
-    ahrs->setGyroOffset();
     while(1)
         imuLoop(ahrs, sock);
 }
