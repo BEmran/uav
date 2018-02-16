@@ -133,9 +133,9 @@ void AHRS::updateIMU(float dt)
     float gy = sensors->imu.gy;
     float gz = sensors->imu.gz;
 
-    ax /= G_SI;
-    ay /= G_SI;
-    az /= G_SI;
+    ax /= 1;//G_SI;
+    ay /= 1;//G_SI;
+    az /= 1;//G_SI;
     gx *= (180 / PI) * 0.0175;
     gy *= (180 / PI) * 0.0175;
     gz *= (180 / PI) * 0.0175;

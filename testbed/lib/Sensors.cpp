@@ -37,8 +37,22 @@ void Sensors::update(){
     is->read_accelerometer(&imu.ax, &imu.ay, &imu.az);
     is->read_gyroscope(&imu.gx, &imu.gy, &imu.gz);
     is->read_magnetometer(&imu.mx, &imu.my, &imu.mz);
+// rotate axis
+   float tmpax = imu.ax;
+   float tmpgx = imu.gx;
+   float tmpmx = imu.mx;
+   imu.ax = -imu.ay;
+   imu.gx = -imu.gy;
+   imu.mx = -imu.my;
+   imu.ay = -tmpax;
+   imu.gy = -tmpgx;
+   imu.my = -tmpmx;
 
 // apply calibration
+    imu.ax /= G_SI;
+    imu.ay /= G_SI;
+    imu.az /= G_SI;
+
     imu.gx -= bias.gx;
     imu.gy -= bias.gy;
     imu.gz -= bias.gz;
