@@ -131,17 +131,25 @@ int main(int argc, char *argv[])
     printf("-------------------------------------------------------------\n");
     printf("-------------------------------------------------------------\n");
  
+float R[3][3] =  {{ 0.99777,  0.00284,  0.00739},
+                     {-0.00364,  0.99825  -0.00989},
+                     {-0.00752,  0.00018,  0.99312}};
+float offset[3] = { 0.00974, 0.01847, -0.01632};
 
     while(1){
         // update imu data
         sensors->update();
 
-            // Console output
-        printf("%d row %+10.5f %+10.5f %+10.5f calibrated %+10.5f %+10.5f %+10.5f \n",
+	float ax2 = sensors->imu.ax * R[0][0] + sensors->imu.ay * R[0][1] + sensors->imu.az * R[0][2] + offset[0];
+        float ay2 = sensors->imu.ax * R[1][0] + sensors->imu.ay * R[1][1] + sensors->imu.az * R[1][2] + offset[1];
+        float az2 = sensors->imu.ax * R[2][0] + sensors->imu.ay * R[2][1] + sensors->imu.az * R[2][2] + offset[2];
+        // Console output
+        printf("%d row %+10.5f %+10.5f %+10.5f calib1 %+10.5f %+10.5f %+10.5f calib2 %+10.5f %+10.5f %+10.5f \n",
         	sensors->imu.ax, sensors->imu.ay, sensors->imu.az,
         	(sensors->imu.ax - ax_bias)/ax_scale,
                 (sensors->imu.ay - ay_bias)/ay_scale,
-                (sensors->imu.az - az_bias)/az_scale);
+                (sensors->imu.az - az_bias)/az_scale,
+                ax2,ay2,az2);
 	usleep(100000);
     }
 
