@@ -26,14 +26,16 @@ public:
     struct imu_struct imu;
     struct imu_struct bias;
 
+    InertialSensor *is;
+
     Sensors (std::string sensor_name);
     void update();
     void calibrateGyro();
 
 private:
-    long unsigned time_now_;
-    InertialSensor *is;
-    FILE * row_data_file_;   // File to store row data
+    long unsigned time_now;
+    //InertialSensor *is;
+    FILE * row_data_file;   // File to store row data
 
     void storeData();
     void getTime();

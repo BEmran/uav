@@ -2,6 +2,31 @@
 #include <unistd.h>
 #include <string>
 #include <memory>
+#include <sys/time.h>
+
+//=============================================================================
+
+float getTime(float hz){
+    struct timeval tv;
+    float dt;
+    // Timing data
+    static unsigned long previoustime, currenttime;
+
+    //----------------------- Calculate delta time ----------------------------
+
+        gettimeofday(&tv,NULL);
+        previoustime = currenttime;
+        currenttime = 1000000 * tv.tv_sec + tv.tv_usec;
+
+        dt = (currenttime - previoustime) / 1000000.0;
+
+        if(dt < 1/hz)
+            usleep((1/hz-dt)*1000000);
+
+        gettimeofday(&tv,NULL);
+        currenttime = 1000000 * tv.tv_sec + tv.tv_usec;
+        dt = (currenttime - previoustime) / 1000000.0;
+}
 //=============================================================================
 void print_help()
 {
@@ -62,14 +87,19 @@ int main(int argc, char *argv[])
 
    sensors->calibrateGyro();
 //-------------------------------------------------------------------------
-
+    float dt;
+    static float dtsumm = 0;
     while(1) {
 	sensors->update();
-        printf("Acc: %+7.3f %+7.3f %+7.3f  ", sensors->imu.ax, sensors->imu.ay, sensors->imu.az);
-        printf("Gyr: %+8.3f %+8.3f %+8.3f  ", sensors->imu.gx, sensors->imu.gy, sensors->imu.gz);
-        printf("Mag: %+7.3f %+7.3f %+7.3f\n", sensors->imu.mx, sensors->imu.my, sensors->imu.mz);
-
-        usleep(100000);
+        dt = getTime(400.0);
+	dtsumm += dt;
+	if(dtsumm > 0.2){
+            dtsumm = 0;
+            printf("Hz %d  ", int(1/dt));
+            printf("Acc: %+7.3f %+7.3f %+7.3f  ", sensors->imu.ax, sensors->imu.ay, sensors->imu.az);
+            printf("Gyr: %+8.3f %+8.3f %+8.3f  ", sensors->imu.gx, sensors->imu.gy, sensors->imu.gz);
+            printf("Mag: %+7.3f %+7.3f %+7.3f\n", sensors->imu.mx, sensors->imu.my, sensors->imu.mz);
+        }
     }
 }
 
