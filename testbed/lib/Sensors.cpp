@@ -1,14 +1,12 @@
 #include "Sensors.h"
 
+Sensors::Sensors (){}
+
+
 Sensors::Sensors (std::string sensor_name){
     bias.gx = 0.0;
     bias.gy = 0.0;
     bias.gz = 0.0;
-
-    // Create a file to store the row data
-    row_data_file = fopen("row_data.txt", "w");
-    printf("Start storing the data in the file \"row_data.txt\"\n");
-    fprintf(row_data_file, "time, ax, ay, az, gx, gy, gz, mx, my, mz\n");
 
     // get current time
     getTime();
@@ -25,9 +23,18 @@ Sensors::Sensors (std::string sensor_name){
         is = NULL;
     }
 
+    // Create a file to store the row data
+    char file_name[128];
+    sprintf(file_name,"row_data_%s.txt", sensor_name.c_str());
+    row_data_file = fopen(file_name, "w");
+    printf("Start storing the data in the file \"%s\"\n",file_name);
+    fprintf(row_data_file, "time, ax, ay, az, gx, gy, gz, mx, my, mz\n");
+
+    // Initilaize imu sensor and calibrate gyro
     is->initialize();
-    isISEnabled = !is->probe();
+    isISEnabled = is->probe();
     if (isISEnabled){
+	printf("inside\n");
 	calibrateGyro();
     }
 }
@@ -92,7 +99,7 @@ void Sensors::calibrateGyro()
     offset[1]/=500.0;
     offset[2]/=500.0;
 
-    printf("Offsets are: %f %f %f\n", offset[0], offset[1], offset[2]);
+    printf("Offsets are: %+10.5f %+10.5f %+10.5f\n", offset[0], offset[1], offset[2]);
 
     bias.gx = offset[0];
     bias.gx = offset[1];

@@ -28,6 +28,7 @@ public:
 
     InertialSensor *is;
 
+    Sensors ();
     Sensors (std::string sensor_name);
     void update();
     void calibrateGyro();
