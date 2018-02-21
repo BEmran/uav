@@ -30,75 +30,85 @@ float getTime(float hz){
 //=============================================================================
 void print_help()
 {
-    printf("Possible parameters:\nSensor selection: -i [sensor name]\n");
-    printf("Sensors names: mpu is MPU9250, lsm is LSM9DS1\nFor help: -h\n");
+    printf("Possible parameters:\n"
+           "- Sensor selection: -i [sensor name]\n");
+    printf("                        Sensors names: \n"
+           "                                     -> mpu is MPU9250\n"
+           "                                     -> lsm is LSM9DS1\n"
+           "                                     -> both for both sensors\n"
+           "- For help: -h\n");
 }
 //=============================================================================
-std::string get_sensor_name(int argc, char *argv[])
+std::string get_sensor_name(int argc, char *argv[], bool& is_both_sensors)
 {
-    if (get_navio_version() == NAVIO2) {
+    if (argc < 2) {
+        printf("Enter parameter\n");
+        print_help();
+        return std::string();
+    }
 
-        if (argc < 2) {
-            printf("Enter parameter\n");
+    // prevent the error message
+    opterr = 0;
+    int parameter;
+
+    while ((parameter = getopt(argc, argv, "i:h")) != -1) {
+        switch (parameter) {
+        case 'i':
+	    if (!strcmp(optarg,"mpu"))
+		 return "mpu";
+            else if (!strcmp(optarg,"lsm"))
+		 return "lsm";
+	    else if (!strcmp(optarg,"both"))
+                 is_both_sensors = true;
+   	    return "mpu";	// if both or anything else return mpu
+        case 'h':
+	    print_help();
+	    return "-1";
+        case '?':
+	    printf("Wrong parameter.\n");
             print_help();
             return std::string();
         }
-
-        // prevent the error message
-        opterr = 0;
-        int parameter;
-
-        while ((parameter = getopt(argc, argv, "i:h")) != -1) {
-            switch (parameter) {
-            case 'i': if (!strcmp(optarg,"mpu") ) return "mpu";
-                            else return "lsm";
-            case 'h': print_help(); return "-1";
-            case '?': printf("Wrong parameter.\n");
-                      print_help();
-                      return std::string();
-            }
-        }
-
-    } else { //sensor on NAVIO+
-
-        return "mpu";
     }
-
 }
 //=============================================================================
 int main(int argc, char *argv[])
 {
+   bool is_both_sensors = false;
 
     if (check_apm()) {
         return 1;
     }
 
-    auto sensor_name = get_sensor_name(argc, argv);
+    auto sensor_name = get_sensor_name(argc, argv, is_both_sensors);
     if (sensor_name.empty())
         return EXIT_FAILURE;
 
+    Sensors* sensors1 = new Sensors(sensor_name);
+    Sensors* sensors2;
+    if (is_both_sensors)
+	sensors2 = new Sensors("lsm");
 
-    Sensors* sensors = new Sensors(sensor_name);
-
-    if (sensors->isISEnabled) {
-        printf("Wrong sensor name. Select: mpu or lsm\n");
+    if (!sensors1->isISEnabled) {
+        printf("Sensor is not enabled\n");
         return EXIT_FAILURE;
     }
 
-   sensors->calibrateGyro();
 //-------------------------------------------------------------------------
     float dt;
     static float dtsumm = 0;
     while(1) {
-	sensors->update();
+	sensors1->update();
+	if (is_both_sensors)
+	    sensors2->update();
         dt = getTime(400.0);
 	dtsumm += dt;
 	if(dtsumm > 0.2){
             dtsumm = 0;
             printf("Hz %d  ", int(1/dt));
-            printf("Acc: %+7.3f %+7.3f %+7.3f  ", sensors->imu.ax, sensors->imu.ay, sensors->imu.az);
-            printf("Gyr: %+8.3f %+8.3f %+8.3f  ", sensors->imu.gx, sensors->imu.gy, sensors->imu.gz);
-            printf("Mag: %+7.3f %+7.3f %+7.3f\n", sensors->imu.mx, sensors->imu.my, sensors->imu.mz);
+            printf("Acc: %+7.3f %+7.3f %+7.3f  ", sensors1->imu.ax, sensors1->imu.ay, sensors1->imu.az);
+            printf("Gyr: %+8.3f %+8.3f %+8.3f  ", sensors1->imu.gx, sensors1->imu.gy, sensors1->imu.gz);
+            printf("Mag: %+7.3f %+7.3f %+7.3f\n", sensors1->imu.mx, sensors1->imu.my, sensors1->imu.mz);
         }
     }
 }
