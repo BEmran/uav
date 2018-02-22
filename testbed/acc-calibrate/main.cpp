@@ -61,12 +61,15 @@ int main(int argc, char *argv[])
 
     Sensors* sensors = new Sensors(sensor_name);
 
-    if (sensors->isISEnabled) {
+    if (!sensors->isISEnabled) {
         printf("Wrong sensor name. Select: mpu or lsm\n");
         return EXIT_FAILURE;
     }
-
-    FILE* file = fopen("acc_calib.txt","w");
+    // Create a file to store the row data
+    char file_name[128];
+    sprintf(file_name,"acc_calib_%s.txt", sensor_name.c_str());
+    printf("Start storing the data in the file \"%s\"\n",file_name);
+    FILE* file = fopen(file_name,"w");
 
     float ax_max,ay_max,az_max;
     float ax_min,ay_min,az_min;
