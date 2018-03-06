@@ -1,16 +1,20 @@
-
 close all
 clear
 clc
 %% Read data
-file_name = 'row_data_lsm2.txt';
-[r_lsm,lsmLS,lsmEF,lsmSC] = read_row_data(file_name);
-file_name = 'row_data_mpu2.txt';
-[r_mpu,mpuLS,mpuEF,mpuSC] = read_row_data(file_name);
+file_name = 'row_data_lsm_slow_rot.txt';
+[r_lsm] = read_row_data(file_name);
+file_name = 'row_data_mpu_slow_rot.txt';
+[r_mpu] = read_row_data(file_name);
+
+%% Calculate Calibration values
+[lsmLS,lsmEF,lsmSC] = calculate_mag_calibration(r_lsm);
+[mpuLS,mpuEF,mpuSC] = calculate_mag_calibration(r_mpu);
 
 %% Apply calibration
-c_lsm.mag = apply_calibration (r_lsm.mx,r_lsm.my,r_lsm.mz,lsmEF.offset,lsmEF.gain,lsmEF.rotation);
-c_mpu.mag = apply_calibration (r_mpu.mx,r_mpu.my,r_mpu.mz,mpuEF.offset,mpuEF.gain,mpuEF.rotation);
+c_lsm.mag = apply_calibration ( r_lsm.mx, r_lsm.my, r_lsm.mz, lsmEF.offset, lsmEF.rotation);
+c_mpu.mag = apply_calibration ( r_mpu.mx, r_mpu.my, r_mpu.mz, mpuEF.offset, mpuEF.rotation);
+
 %%
 figure('name','mag')
 subplot(221)
