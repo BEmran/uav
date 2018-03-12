@@ -25,5 +25,6 @@ AT=Tmtx*A*Tmtx'; % ellipsoid translated to (0,0,0)
 
 [rotM, ev] = eig(AT(1:3,1:3)/-AT(4,4));
 % eigenvectors (rotation) and eigenvalues (gain)
+
 gain = sqrt(1./diag(ev)); 
 % gain is radius of the ellipsoid
