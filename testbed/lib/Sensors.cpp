@@ -3,7 +3,8 @@
 Sensors::Sensors (){}
 
 
-Sensors::Sensors (std::string sensor_name){
+Sensors::Sensors (std::string sensor_name, bool debug = true){
+    is_debug = debug;
     bias.gx = 0.0;
     bias.gy = 0.0;
     bias.gz = 0.0;
@@ -24,11 +25,13 @@ Sensors::Sensors (std::string sensor_name){
     }
 
     // Create a file to store the row data
+    if (is_debug){
     char file_name[128];
     sprintf(file_name,"row_data_%s.txt", sensor_name.c_str());
     row_data_file = fopen(file_name, "w");
     printf("Start storing the data in the file \"%s\"\n",file_name);
     fprintf(row_data_file, "time, ax, ay, az, gx, gy, gz, mx, my, mz\n");
+    }
 
     // Initilaize imu sensor and calibrate gyro
     is->initialize();
@@ -65,7 +68,9 @@ void Sensors::update(){
     imu.gz -= bias.gz;
 
 // store data
-    storeData();
+    if (is_debug){
+        storeData();
+    }
 
 }
 
@@ -75,11 +80,9 @@ void Sensors::update(){
 void Sensors::calibrateGyro()
 {
     //---------------------- Calculate the offset -----------------------------
-
     float offset[3] = {0.0, 0.0, 0.0};
 
     //-------------------------------------------------------------------------
-
     printf("Beginning Gyro calibration...\n");
     for(int i = 0; i<500; i++)
     {
