@@ -8,7 +8,6 @@
 #include <string>
 #include <stdio.h>	// file, printf
 #include <sys/time.h>	// time
-#include <Encoder.h>    // encoder
 
 namespace {
     #define G_SI 9.80665
@@ -27,9 +26,7 @@ public:
     bool isISEnabled;
     struct imu_struct imu;
     struct imu_struct bias;
-
-    InertialSensor *is;
-    
+   
     Sensors ();
     Sensors (std::string sensor_name);
     void update();
@@ -37,7 +34,7 @@ public:
 
 private:
     long unsigned time_now;
-    //InertialSensor *is;
+    InertialSensor *is;
     FILE * row_data_file;   // File to store row data
 
     void storeData();

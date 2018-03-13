@@ -36,6 +36,13 @@ Encoder::Encoder() {
     _is_enbaled[2] = false;
     PhidgetReturnCode res;
     const char *errs;
+    
+    // Create a file to store the row data
+    row_data_file = fopen("row_data_encoder.txt", "w");
+    printf("Start storing the encoder data in the file \"row_data_encoder.txt\" \n");
+    fprintf(row_data_file, "time, ang0, ang1, ang2\n");
+
+    
     // initialize encoders
     for (int i = 0; i < 3; ++i) {
         if (init(i)) {
@@ -87,6 +94,7 @@ void Encoder::updateCounts() {
         PhidgetEncoder_getIndexPosition(_eh[ch], &_index[ch]);
         _count[ch] = _count[ch] - _index[ch];
     }
+    storeData();
 }
 
 void Encoder::getCounts(long counts[]) const {
@@ -194,4 +202,31 @@ bool Encoder::getInfo(int i) {
     }
 
     return true;
+}
+
+//**************************************************************************
+// Store row measurements
+//**************************************************************************
+
+void Encoder::storeData() {
+    // get current time
+    getTime();
+    // read angle value
+    float ang[3];
+    readAnglesRad(ang);
+    // Write data
+    fprintf(row_data_file, "%12lu,",time_now);
+    fprintf(row_data_file, " %+10.5f,  %+10.5f,  %+10.5f\n",ang[0], ang[1], ang[2]);
+}
+//**************************************************************************
+// Get the current time
+//**************************************************************************
+
+void Encoder::getTime() {
+    // Timing data
+    struct timeval tv;
+
+    // Calculate delta time
+    gettimeofday(&tv, NULL);
+    time_now = 1000000 * tv.tv_sec + tv.tv_usec;
 }
