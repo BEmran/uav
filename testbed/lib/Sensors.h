@@ -8,10 +8,12 @@
 #include <string>
 #include <stdio.h>	// file, printf
 #include <sys/time.h>	// time
+#include <Encoder.h>    // encoder
 
-
-#define G_SI 9.80665
-#define PI   3.14159
+namespace {
+    #define G_SI 9.80665
+    #define PI   3.14159  
+}
 
 struct imu_struct{
     float ax, ay, az;
@@ -27,7 +29,7 @@ public:
     struct imu_struct bias;
 
     InertialSensor *is;
-
+    
     Sensors ();
     Sensors (std::string sensor_name);
     void update();
